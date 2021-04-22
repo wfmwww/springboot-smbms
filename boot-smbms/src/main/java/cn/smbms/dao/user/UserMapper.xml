@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.smbms.dao.user.UserMapper">
+    <!--根据userCode和密码获取用户登录-->
+    <select id="getLogin" resultType="user">
+        select * from smbms_user
+        <where>
+            <if test="userCode!=null and userCode!=''">
+                and userCode=#{userCode}
+            </if>
+            <if test="userPassword!=null and userPassword!=''">
+                and userPassword=#{userPassword}
+            </if>
+        </where>
+    </select>
+    <!--用户列表展示-->
+    <select id="getUserList" resultType="user">
+        select u.*,r.roleName userRoleName from smbms_user u inner join smbms_role r on u.userRole=r.id
+        <where>
+            <if test="userName!=null and userName!=''">
+                and u.userName like CONCAT('%',#{userName},'%')
+            </if>
+            <if test="userRole!=null and userRole!=0">
+                and u.userRole = #{userRole}
+            </if>
+        </where>
+        order by creationDate DESC limit #{pageIndex},#{pageSize}
+    </select>
+    <!--根据用户名和角色查询用户总数-->
+    <select id="getUserCount" resultType="int">
+        select COUNT(1) from smbms_user
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="userName!=null and userName!=''">
+                and userName like concat('%',#{userName},'%')
+            </if>
+            <if test="userRole!=null and userRole!=0">
+                and userRole=#{userRole}
+            </if>
+        </trim>
+    </select>
+   <!-- 增加用户-->
+    <insert id="addUser" parameterType="user">
+        insert into smbms_user(userCode,userName,userPassword,gender,birthday,
+		phone,address,userRole,createdBy,creationDate,modifyBy,modifyDate,idPicPath,workPicPath)
+		values(#{userCode},#{userName},#{userPassword},#{gender},#{birthday},#{phone},
+		#{address},#{userRole},#{createdBy},#{creationDate},#{modifyBy},
+		#{modifyDate},#{idPicPath},#{workPicPath});
+    </insert>
+    <!--用户编码是否存在-->
+    <select id="userCodeExist" parameterType="string" resultType="int">
+        select count(1) from smbms_user where userCode=#{userCode}
+    </select>
+    <!--根据用户id查询用户-->
+    <select id="getUserById" resultType="user">
+         select u.*,r.roleName userRoleName from smbms_user u inner join smbms_role r on u.userRole=r.id
+         where u.id=#{id}
+    </select>
+    <!--修改用户信息-->
+    <update id="upUserById" parameterType="user">
+        update smbms_user
+        <set>
+            userName=#{userName},
+            gender=#{gender},birthday=#{birthday},
+            phone=#{phone},address=#{address},userRole=#{userRole},
+            modifyBy=#{modifyBy},modifyDate=#{modifyDate},
+            idPicPath=#{idPicPath},workPicPath=#{workPicPath}
+        </set>
+        where id=#{id}
+    </update>
+    <!--删除-->
+    <delete id="delUserById" parameterType="string">
+        delete from smbms_user where  id=#{id}
+    </delete>
+
+    <!--修改密码-->
+    <update id="upPw">
+        update smbms_user set userPassword=#{newPw} where id=#{id}
+    </update>
+    <!--shiro-->
+    <select id="shiroUserCode" resultMap="userList" parameterType="string">
+        select u.*,r.id r_id,r.* from smbms_user u left join smbms_role r
+        on u.userRole=r.id
+        where userCode=#{userCode}
+    </select>
+    <resultMap id="userList" type="user">
+        <id column="id" property="id"/>
+        <result column="userCode" property="userCode"/>
+        <result column="userName" property="userName"/>
+        <result column="userPassword" property="userPassword"/>
+        <result column="userRole" property="userRole"/>
+        <result column="salt" property="salt"/>
+        <association property="role" javaType="role">
+            <id column="r_id" property="id"/>
+            <result column="roleCode" property="roleCode"/>
+            <result column="roleName" property="roleName"/>
+        </association>
+
+    </resultMap>
+
+    <select id="getAllUser" resultMap="userList">
+        select u.*,r.id r_id,r.* from smbms_user u left join smbms_role r
+        on u.userRole=r.id
+    </select>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--输出日志到控制台-->
+    <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
+        <layout>
+            <pattern>
+                [%p]%d - %msg%n
+            </pattern>
+        </layout>
+    </appender>
+    <!--输出日志到文件-->
+    <appender name="fileLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--        过滤等级-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>debug</level>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <encoder>
+            <pattern><!--输出格式-->
+                [%p]%d - %msg%n
+            </pattern>
+        </encoder>
+        <!--指定文件的位置-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                D:/j93log/%d.log
+            </fileNamePattern>
+        </rollingPolicy>
+    </appender>
+    <root level="info">
+        <!--让配置生效-->
+        <appender-ref ref="consoleLog"></appender-ref>
+        <appender-ref ref="fileLog"></appender-ref>
+    </root>
+</configuration>

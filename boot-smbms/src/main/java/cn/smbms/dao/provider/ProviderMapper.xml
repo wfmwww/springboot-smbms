@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.smbms.dao.provider.ProviderMapper">
+    <!--查询供应商-->
+    <select id="getProList" resultType="provider">
+        select * from smbms_provider
+        <where>
+            <if test="proCode!=null and proCode!=''">
+              and  proCode like concat('%',#{proCode},'%')
+            </if>
+             <if test="proName!=null and proName!=''">
+              and  proName like concat('%',#{proName},'%')
+            </if>
+        </where>
+        order by creationDate DESC limit #{pageIndex},#{pageSize}
+    </select>
+
+   <!-- //根据用户名和角色查询用户总数-->
+    <select id="getProCount" resultType="int">
+        select count(1) from smbms_provider
+        <where>
+            <if test="proCode!=null and proCode!=''">
+                and  proCode like concat('%',#{proCode},'%')
+            </if>
+            <if test="proName!=null and proName!=''">
+                and  proName like concat('%',#{proName},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--增加-->
+    <insert id="addPro" parameterType="provider">
+		insert into smbms_provider(proCode,proName,proDesc,proContact,proPhone,
+		proAddress,proFax,createdBy,creationDate)
+		values(#{proCode},#{proName},#{proDesc},#{proContact},#{proPhone},#{proAddress},
+		#{proFax},#{createdBy},#{creationDate});
+	</insert>
+
+    <!--修改-->
+    <update id="upPro" parameterType="provider">
+		update smbms_provider set proCode=#{proCode},proName=#{proName},proDesc=#{proDesc},
+		proContact=#{proContact},proPhone=#{proPhone},proAddress=#{proAddress},
+		proFax=#{proFax},modifyDate=#{modifyDate},modifyBy=#{modifyBy}
+		where id=#{id}
+	</update>
+
+    <!--删除-->
+    <delete id="delPro" parameterType="string">
+		delete from smbms_provider where id=#{id}
+	</delete>
+
+    <!--查询id-->
+    <select id="getProById" resultType="provider">
+        select * from smbms_provider where id=#{id}
+    </select>
+
+    <!--查询所有-->
+    <select id="getAll" resultType="provider">
+        select * from smbms_provider
+    </select>
+</mapper>
